@@ -1,0 +1,1157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="SILA TECH - Advanced Digital Tools Platform">
+  <meta name="author" content="SILA">
+  <title>SILA - Digital Tools</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary: #4361ee;
+      --primary-dark: #3a0ca3;
+      --secondary: #0a0a18;
+      --accent: #f72585;
+      --accent-alt: #4cc9f0;
+      --background: #050510;
+      --card-bg: rgba(30, 30, 60, 0.6);
+      --text: #f0f0f0;
+      --text-muted: #a0a0a0;
+      --neon-glow: 0 0 10px var(--primary), 0 0 20px var(--primary);
+      --accent-glow: 0 0 10px var(--accent), 0 0 20px var(--accent);
+      --menu-bg: rgba(20, 20, 40, 0.95);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+      background: var(--background);
+      color: var(--text);
+      font-family: 'Poppins', sans-serif;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Splash Screen */
+    #splash-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--background);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 10000;
+      transition: opacity 0.8s ease-out;
+    }
+
+    .splash-logo {
+      font-size: 5rem;
+      font-weight: 800;
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      margin-bottom: 2rem;
+      text-shadow: 0 0 20px rgba(67, 97, 238, 0.5);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.05); opacity: 0.8; }
+    }
+
+    /* Loading Screen */
+    #loading-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--background);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      opacity: 0;
+      transition: opacity 0.8s ease-out;
+    }
+
+    .circular-scan {
+      width: 300px;
+      height: 300px;
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .scan-circle {
+      width: 250px;
+      height: 250px;
+      border: 3px solid rgba(76, 201, 240, 0.3);
+      border-radius: 50%;
+      position: relative;
+    }
+
+    .scan-radar {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      width: 3px;
+      height: 125px;
+      background: linear-gradient(to bottom, transparent, #4cc9f0, transparent);
+      transform-origin: bottom center;
+      animation: radarSpin 3s infinite linear;
+      box-shadow: 0 0 15px #4cc9f0;
+    }
+
+    @keyframes radarSpin {
+      0% { transform: translateX(-50%) rotate(0deg); }
+      100% { transform: translateX(-50%) rotate(360deg); }
+    }
+
+    .scan-glow {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      box-shadow: 
+        0 0 30px rgba(76, 201, 240, 0.5),
+        inset 0 0 30px rgba(76, 201, 240, 0.2);
+      animation: pulseGlow 2s infinite alternate;
+    }
+
+    @keyframes pulseGlow {
+      0% { opacity: 0.5; }
+      100% { opacity: 1; }
+    }
+
+    .scanning-container {
+      width: 300px;
+      height: 200px;
+      background: rgba(10, 10, 30, 0.8);
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 0 30px rgba(67, 97, 238, 0.3);
+      border: 1px solid var(--primary);
+      position: relative;
+      overflow: hidden;
+      margin-top: 2rem;
+    }
+
+    .scan-title {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #4cc9f0;
+      font-size: 1.2rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+
+    .scan-progress {
+      height: 30px;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 15px;
+      overflow: hidden;
+      position: relative;
+      margin-bottom: 20px;
+      border: 1px solid #4cc9f0;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #4cc9f0, #4361ee);
+      border-radius: 15px;
+      transition: width 0.3s ease;
+    }
+
+    .progress-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: white;
+      font-weight: bold;
+      text-shadow: 0 0 5px rgba(0, 0, 0, 0.8);
+    }
+
+    .scan-items {
+      list-style: none;
+    }
+
+    .scan-item {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    .scan-status {
+      color: #4cc9f0;
+    }
+
+    /* Background with multiple layers */
+    .bg-wrapper {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -10;
+      overflow: hidden;
+    }
+
+    .bg-layer {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    .bg-layer-1 {
+      background: linear-gradient(45deg, #050510 0%, #0f0f23 100%);
+      z-index: -5;
+    }
+
+    .bg-layer-2 {
+      background: 
+        radial-gradient(circle at 10% 20%, rgba(67, 97, 238, 0.15) 0%, transparent 30%),
+        radial-gradient(circle at 90% 80%, rgba(247, 37, 133, 0.1) 0%, transparent 30%);
+      z-index: -4;
+      animation: pulse 15s infinite alternate;
+    }
+
+    .bg-layer-3 {
+      background-image: 
+        linear-gradient(rgba(20, 20, 50, 0.4) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(20, 20, 50, 0.4) 1px, transparent 1px);
+      background-size: 50px 50px;
+      z-index: -3;
+      animation: gridMove 30s infinite linear;
+    }
+
+    @keyframes gridMove {
+      0% {
+        transform: translateY(0) translateX(0);
+      }
+      100% {
+        transform: translateY(50px) translateX(50px);
+      }
+    }
+
+    .floating-shapes {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -2;
+      overflow: hidden;
+    }
+
+    .shape {
+      position: absolute;
+      border-radius: 50%;
+      opacity: 0.5;
+      animation: float 20s infinite ease-in-out;
+      filter: blur(15px);
+    }
+
+    .shape-1 {
+      width: 300px;
+      height: 300px;
+      background: var(--primary);
+      top: 10%;
+      left: 5%;
+      animation-delay: 0s;
+    }
+
+    .shape-2 {
+      width: 200px;
+      height: 200px;
+      background: var(--accent);
+      top: 60%;
+      left: 80%;
+      animation-delay: -5s;
+    }
+
+    .shape-3 {
+      width: 250px;
+      height: 250px;
+      background: var(--primary-dark);
+      top: 30%;
+      left: 70%;
+      animation-delay: -10s;
+    }
+
+    .shape-4 {
+      width: 180px;
+      height: 180px;
+      background: var(--accent-alt);
+      top: 70%;
+      left: 10%;
+      animation-delay: -15s;
+    }
+
+    @keyframes float {
+      0%, 100% {
+        transform: translateY(0) translateX(0) rotate(0deg) scale(1);
+      }
+      25% {
+        transform: translateY(-50px) translateX(40px) rotate(90deg) scale(1.1);
+      }
+      50% {
+        transform: translateY(30px) translateX(80px) rotate(180deg) scale(0.9);
+      }
+      75% {
+        transform: translateY(60px) translateX(20px) rotate(270deg) scale(1.05);
+      }
+    }
+
+    /* Menu Button */
+    .menu-btn {
+      position: fixed;
+      top: 25px;
+      left: 25px;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: var(--card-bg);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(67, 97, 238, 0.3);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      z-index: 100;
+      box-shadow: 0 0 15px rgba(67, 97, 238, 0.3);
+      transition: all 0.3s ease;
+    }
+
+    .menu-btn:hover {
+      transform: rotate(90deg);
+      box-shadow: 0 0 20px rgba(67, 97, 238, 0.5);
+    }
+
+    .menu-btn i {
+      font-size: 1.5rem;
+      color: var(--primary);
+    }
+
+    /* Navigation Menu */
+    #nav-menu {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 300px;
+      height: 100%;
+      background: var(--menu-bg);
+      backdrop-filter: blur(15px);
+      z-index: 90;
+      transform: translateX(-100%);
+      transition: transform 0.4s ease;
+      padding: 80px 30px 30px;
+      box-shadow: 5px 0 25px rgba(0, 0, 0, 0.5);
+      display: flex;
+      flex-direction: column;
+    }
+
+    #nav-menu.active {
+      transform: translateX(0);
+    }
+
+    .menu-header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .menu-header h2 {
+      font-size: 1.8rem;
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      margin-bottom: 10px;
+    }
+
+    .menu-items {
+      list-style: none;
+      flex-grow: 1;
+    }
+
+    .menu-item {
+      margin-bottom: 15px;
+    }
+
+    .menu-link {
+      display: flex;
+      align-items: center;
+      padding: 12px 15px;
+      background: rgba(67, 97, 238, 0.1);
+      border-radius: 8px;
+      text-decoration: none;
+      color: var(--text);
+      transition: all 0.3s ease;
+      border: 1px solid transparent;
+    }
+
+    .menu-link:hover {
+      background: rgba(67, 97, 238, 0.2);
+      transform: translateX(5px);
+      border-color: var(--primary);
+    }
+
+    .menu-link i {
+      margin-right: 12px;
+      font-size: 1.2rem;
+      color: var(--primary);
+    }
+
+    .menu-footer {
+      margin-top: auto;
+      padding-top: 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      text-align: center;
+    }
+
+    .menu-footer p {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-bottom: 15px;
+    }
+
+    .whatsapp-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 20px;
+      background: rgba(37, 211, 102, 0.2);
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(37, 211, 102, 0.3);
+    }
+
+    .whatsapp-btn:hover {
+      background: rgba(37, 211, 102, 0.3);
+      transform: translateY(-3px);
+    }
+
+    .whatsapp-btn i {
+      margin-right: 8px;
+    }
+
+    /* Main Content */
+    .main-container {
+      width: 90%;
+      max-width: 1200px;
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+      margin: 2rem 0;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+
+    .main-container.loaded {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .header {
+      text-align: center;
+      padding: 3rem 2rem;
+      background: var(--card-bg);
+      border-radius: 20px;
+      box-shadow: 0 0 40px rgba(67, 97, 238, 0.2);
+      backdrop-filter: blur(15px);
+      border: 1px solid rgba(67, 97, 238, 0.2);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .header::before {
+      content: '';
+      position: absolute;
+      top: -2px;
+      left: -2px;
+      right: -2px;
+      bottom: -2px;
+      z-index: -1;
+      background: linear-gradient(45deg, var(--primary), transparent, var(--accent), transparent, var(--primary));
+      background-size: 400% 400%;
+      animation: gradientShift 8s ease infinite;
+      border-radius: 22px;
+      opacity: 0.5;
+    }
+
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .logo-container {
+      position: relative;
+      margin-bottom: 2rem;
+      display: flex;
+      justify-content: center;
+    }
+
+    .logo {
+      width: 120px;
+      height: 120px;
+      filter: drop-shadow(var(--neon-glow));
+      animation: pulse 3s infinite ease-in-out;
+    }
+
+    h1 {
+      font-size: 3.5rem;
+      margin-bottom: 1rem;
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      font-weight: 800;
+      letter-spacing: 2px;
+      text-shadow: 0 0 5px rgba(67, 97, 238, 0.5);
+      position: relative;
+      display: inline-block;
+    }
+
+    h1::after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: 10%;
+      width: 80%;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, var(--primary), transparent);
+    }
+
+    .subtitle {
+      font-size: 1.3rem;
+      color: var(--text-muted);
+      margin-bottom: 1rem;
+      font-weight: 300;
+      max-width: 700px;
+      margin-left: auto;
+      margin-right: auto;
+      line-height: 1.6;
+    }
+
+    .stats {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      margin-top: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .stat-item {
+      background: rgba(0, 0, 0, 0.3);
+      padding: 1rem 1.5rem;
+      border-radius: 12px;
+      border: 1px solid rgba(67, 97, 238, 0.2);
+      min-width: 150px;
+      text-align: center;
+      backdrop-filter: blur(5px);
+      transform: translateZ(0);
+      transition: transform 0.3s ease;
+    }
+
+    .stat-item:hover {
+      transform: translateY(-5px) translateZ(0);
+    }
+
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 700;
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .tools-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 2rem;
+    }
+
+    .tool-card {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+      backdrop-filter: blur(15px);
+      border: 1px solid rgba(67, 97, 238, 0.2);
+      transition: all 0.4s ease;
+      position: relative;
+      overflow: hidden;
+      transform-style: preserve-3d;
+      perspective: 1000px;
+    }
+
+    .tool-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, rgba(67, 97, 238, 0.1), rgba(247, 37, 133, 0.1));
+      z-index: -1;
+      clip-path: circle(0% at 50% 50%);
+      transition: clip-path 0.6s cubic-bezier(0.65, 0, 0.35, 1);
+    }
+
+    .tool-card:hover::before {
+      clip-path: circle(100% at 50% 50%);
+    }
+
+    .tool-card:hover {
+      transform: translateY(-10px) rotateX(5deg) rotateY(-5deg) scale(1.02);
+      box-shadow: 0 10px 30px rgba(67, 97, 238, 0.3);
+      border-color: var(--primary);
+    }
+
+    .tool-icon {
+      font-size: 2.5rem;
+      margin-bottom: 1.5rem;
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      transition: all 0.3s ease;
+    }
+
+    .tool-card:hover .tool-icon {
+      transform: scale(1.2) rotate(10deg);
+    }
+
+    .tool-title {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+      font-weight: 600;
+    }
+
+    .tool-desc {
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+      font-size: 0.95rem;
+      line-height: 1.6;
+      flex-grow: 1;
+    }
+
+    .tool-btn {
+      position: relative;
+      padding: 0.8em 1.8em;
+      background: rgba(15, 15, 25, 0.6);
+      border-radius: 8px;
+      border: 1px solid rgba(67, 97, 238, 0.3);
+      color: var(--text);
+      font-size: 0.9rem;
+      font-family: 'Poppins', sans-serif;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      cursor: pointer;
+      overflow: hidden;
+      transition: all 0.4s ease;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+      justify-content: center;
+    }
+
+    .tool-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      z-index: -1;
+      clip-path: circle(0% at 50% 50%);
+      transition: clip-path 0.6s cubic-bezier(0.65, 0, 0.35, 1);
+    }
+
+    .tool-btn:hover::before {
+      clip-path: circle(100% at 50% 50%);
+    }
+
+    .tool-btn:hover {
+      color: #fff;
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(67, 97, 238, 0.4);
+      border-color: var(--primary);
+    }
+
+    .feature-badge {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      background: var(--accent);
+      color: white;
+      font-size: 0.7rem;
+      padding: 3px 8px;
+      border-radius: 10px;
+      font-weight: bold;
+      animation: blink 2s infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+
+    .footer {
+      margin-top: 3rem;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      font-family: 'JetBrains Mono', monospace;
+      text-align: center;
+      padding: 2rem;
+      background: var(--card-bg);
+      border-radius: 16px;
+      width: 100%;
+      position: relative;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(67, 97, 238, 0.2);
+    }
+
+    .footer::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(67, 97, 238, 0.5), transparent);
+    }
+
+    @media (max-width: 768px) {
+      h1 {
+        font-size: 2.5rem;
+      }
+      .subtitle {
+        font-size: 1.1rem;
+      }
+      .stats {
+        flex-direction: column;
+        align-items: center;
+      }
+      .stat-item {
+        width: 100%;
+        max-width: 250px;
+      }
+      .tools-grid {
+        grid-template-columns: 1fr;
+      }
+      .logo {
+        width: 100px;
+        height: 100px;
+      }
+      #nav-menu {
+        width: 250px;
+      }
+      .splash-logo {
+        font-size: 3.5rem;
+      }
+      .circular-scan {
+        width: 250px;
+        height: 250px;
+      }
+      .scan-circle {
+        width: 200px;
+        height: 200px;
+      }
+    }
+    
+  </style>
+</head>
+<body>
+  <!-- Splash Screen -->
+  <div id="splash-screen">
+    <div class="splash-logo">SILA TECH®</div>
+  </div>
+
+  <!-- Loading Screen -->
+  <div id="loading-screen">
+    <div class="circular-scan">
+      <div class="scan-circle">
+        <div class="scan-radar"></div>
+        <div class="scan-glow"></div>
+      </div>
+    </div>
+    
+    <div class="scanning-container">
+      <h2 class="scan-title">System Security Scan</h2>
+      <div class="scan-progress">
+        <div class="progress-bar" id="progress-bar"></div>
+        <div class="progress-text" id="progress-text">0%</div>
+      </div>
+      <ul class="scan-items">
+        <li class="scan-item">
+          <span>Firewall Check</span>
+          <span class="scan-status" id="status-1">Pending...</span>
+        </li>
+        <li class="scan-item">
+          <span>Encryption Test</span>
+          <span class="scan-status" id="status-2">Pending...</span>
+        </li>
+        <li class="scan-item">
+          
+          <span>Database Security</span>
+     <span class="scan-status" id="status-3">Pending...</span>
+        </li>
+        <li class="scan-item">
+          <span>Network Protocols</span>
+          <span class="scan-status" id="status-4">Pending...</span>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="bg-wrapper">
+    <div class="bg-layer bg-layer-1"></div>
+    <div class="bg-layer bg-layer-2"></div>
+    <div class="bg-layer bg-layer-3"></div>
+  </div>
+  
+  <div class="floating-shapes">
+    <div class="shape shape-1"></div>
+    <div class="shape shape-2"></div>
+    <div class="shape shape-3"></div>
+    <div class="shape shape-4"></div>
+  </div>
+
+  <!-- Menu Button -->
+  <div class="menu-btn" id="menu-toggle">
+    <i class="fas fa-plus"></i>
+  </div>
+
+  <!-- Navigation Menu -->
+  <div id="nav-menu">
+    <div class="menu-header">
+      <h2>SILA</h2>
+      <p>Navigation Menu</p>
+    </div>
+    <ul class="menu-items">
+      <li class="menu-item">
+        <a href="#" class="menu-link">
+          <i class="fas fa-home"></i>
+          <span>Home</span>
+        </a>
+      </li>
+      <li class="menu-item">
+        <a href="/pair" class="menu-link">
+          <i class="fas fa-link"></i>
+          <span>Pair Code</span>
+        </a>
+      </li>
+      <li class="menu-item">
+        <a href="/qr" class="menu-link">
+          <i class="fas fa-qrcode"></i>
+          <span>QR Generator</span>
+        </a>
+      </li>
+      <li class="menu-item">
+        <a href="/analyzer" class="menu-link">
+          <i class="fas fa-chart-line"></i>
+          <span>Code Analyzer</span>
+        </a>
+      </li>
+      <li class="menu-item">
+        <a href="/security" class="menu-link">
+          <i class="fas fa-shield-alt"></i>
+          <span>Security Scan</span>
+        </a>
+      </li>
+      <li class="menu-item">
+        <a href="https://github.com/toxiclover-tech" class="menu-link">
+          <i class="fab fa-github"></i>
+          <span>GitHub</span>
+        </a>
+      </li>
+    </ul>
+    <div class="menu-footer">
+      <p>Contact us on WhatsApp</p>
+      <a href="https://wa.me/255612491554" class="whatsapp-btn">
+        <i class="fab fa-whatsapp"></i>
+        Contact Now
+      </a>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-container" id="main-content">
+    <div class="header">
+      <div class="logo-container">
+        <svg class="logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="16"></line>
+          <line x1="8" y1="12" x2="16" y2="12"></line>
+        </svg>
+      </div>
+      <h1>SILA</h1>
+      
+      <p class="subtitle"> welcome to pairing site see contributers</p>
+      <h2>ATTENTION PLEASE</h2>
+      <P>READ MOVING WORDS</P>
+      
+      <h1>✎ᝰ✄</h1>
+      
+      <p>﹌﹌﹌﹌﹌﹌﹌﹌﹌﹌﹌</p>
+      <p><marquee> hello 👋 user(s)
+      SILA Digital Tools is a premium cyberpunk-styled web application that provides essential digital utilities including QR code generation, secure pairing, code analysis, and security scanning. Featuring an immersive 3D interface with interactive elements, glassmorphism design, and particle effects, it offers both functionality and visual appeal. The responsive design works across all devices, making it perfect for developers, professionals, and tech enthusiasts who need quick access to digital tools in a futuristic interface.</marquee></p>
+       <p>﹌﹌﹌﹌﹌﹌﹌﹌﹌﹌﹌</p>
+      <div class="stats">
+        <div class="stat-item">
+          <div class="stat-value">SILA</div>
+          <div class="stat-label">main developer</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">SILA TECH</div>
+          <div>developer</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">YOU</div>
+          <div class="stat-label">support 
+          ─〇───</div>
+        </div>
+      </div>
+      <br>
+      <p>code</p>
+          <h1>𝄃𝄃𝄂𝄂𝄀𝄁𝄃𝄂𝄂𝄃𝄃𝄃𝄂𝄂𝄀𝄁</h1>
+      
+    </div>
+    
+    <div class="tools-grid">
+      <div class="tool-card">
+        <i class="fas fa-qrcode tool-icon"></i>
+        <h3 class="tool-title">QR Generator</h3>
+        <p class="tool-desc">Create customized QR codes with advanced styling options and analytics tracking.</p>
+        <button onclick="window.open('/qr', '_self')" class="tool-btn">
+          <i class="fas fa-arrow-right"></i> Access Tool
+        </button>
+        <span class="feature-badge">NEW</span>
+      </div>
+      
+      <div class="tool-card">
+        <i class="fas fa-link tool-icon"></i>
+        <h3 class="tool-title">Pair Code</h3>
+        <p class="tool-desc">Generate secure pairing codes for device authentication and connection protocols.</p>
+        <button onclick="window.open('/pair', '_self')" class="tool-btn">
+          <i class="fas fa-arrow-right"></i> Access Tool
+        </button>
+        <span class="feature-badge">PRO</span>
+      </div>
+      
+      <div class="tool-card">
+        <i class="fas fa-chart-line tool-icon"></i>
+        <h3 class="tool-title">Code Analyzer</h3>
+        <p class="tool-desc">Advanced analysis tools for evaluating code performance and security vulnerabilities.</p>
+        <button onclick="window.open('/analyzer', '_self')" class="tool-btn">
+          <i class="fas fa-arrow-right"></i> Access Tool
+        </button>
+      </div>
+      
+      <div class="tool-card">
+        <i class="fas fa-shield-alt tool-icon"></i>
+        <h3 class="tool-title">Security Scan</h3>
+        <p class="tool-desc">Comprehensive security scanning with real-time threat detection and mitigation.</p>
+        <button onclick="window.open('/security', '_self')" class="tool-btn">
+          <i class="fas fa-arrow-right"></i> Access Tool
+        </button>
+      </div>
+      
+      <div class="tool-card">
+        <i class="fab fa-github tool-icon"></i>
+        <h3 class="tool-title">GitHub</h3>
+        <p class="tool-desc">Explore our open-source projects and contribute to the development community.</p>
+        <button onclick="window.open('https://github.com/silatrix2', '_blank')" class="tool-btn">
+          <i class="fas fa-arrow-right"></i> Visit GitHub
+        </button>
+      </div>
+      
+      <div class="tool-card">
+        <i class="fab fa-whatsapp tool-icon"></i>
+        <h3 class="tool-title">WhatsApp</h3>
+        <p class="tool-desc">Join our community channel for updates, support, and collaborative discussions.</p>
+        <button onclick="window.open('https://whatsapp.com/channel/0029Vb6DeKwCHDygxt0RXh0L', '_blank')" class="tool-btn">
+          <i class="fas fa-arrow-right"></i> Join Channel
+        </button>
+      </div>
+    </div>
+    
+    <div class="footer">
+      <p>© 2025 SILA TECH | Advanced Digital Solutions
+      <p>Designed with <i class="fas fa-heart" style="color: var(--accent);"></i> for the digital future
+      <button class="footer"><a href="http://wa.me/255612491554">contact</a></button></p>
+    </div>
+  </div>
+
+  <script>
+    // Simulate loading process
+    document.addEventListener('DOMContentLoaded', function() {
+      // Show splash screen first
+      const splashScreen = document.getElementById('splash-screen');
+      const loadingScreen = document.getElementById('loading-screen');
+      const progressBar = document.getElementById('progress-bar');
+      const progressText = document.getElementById('progress-text');
+      const status1 = document.getElementById('status-1');
+      const status2 = document.getElementById('status-2');
+      const status3 = document.getElementById('status-3');
+      const status4 = document.getElementById('status-4');
+      const mainContent = document.getElementById('main-content');
+      
+      // Show splash screen for 2 seconds
+      setTimeout(() => {
+        splashScreen.style.opacity = '0';
+        setTimeout(() => {
+          splashScreen.style.display = 'none';
+          loadingScreen.style.opacity = '1';
+          
+          let progress = 0;
+          const interval = setInterval(() => {
+            progress += Math.random() * 5;
+            if (progress > 100) progress = 100;
+            
+            progressBar.style.width = progress + '%';
+            progressText.textContent = Math.round(progress) + '%';
+            
+            // Update status messages
+            if (progress > 20) status1.textContent = '✓ Secure';
+            if (progress > 40) status2.textContent = '✓ Encrypted';
+            if (progress > 60) status3.textContent = '✓ Protected';
+            if (progress > 80) status4.textContent = '✓ Verified';
+            
+            if (progress === 100) {
+              clearInterval(interval);
+              setTimeout(() => {
+                loadingScreen.style.opacity = '0';
+                setTimeout(() => {
+                  loadingScreen.style.display = 'none';
+                  mainContent.classList.add('loaded');
+                }, 800);
+              }, 500);
+            }
+          }, 100);
+        }, 800);
+      }, 2000);
+    });
+    
+    // Menu toggle functionality
+    document.getElementById('menu-toggle').addEventListener('click', function() {
+      document.getElementById('nav-menu').classList.toggle('active');
+      this.classList.toggle('active');
+    });
+    
+    // Close menu when clicking outside
+    document.addEventListener('click', function(event) {
+      const menu = document.getElementById('nav-menu');
+      const menuToggle = document.getElementById('menu-toggle');
+      
+      if (!menu.contains(event.target) && !menuToggle.contains(event.target) && menu.classList.contains('active')) {
+        menu.classList.remove('active');
+        menuToggle.classList.remove('active');
+      }
+    });
+    
+    // Enhanced animations
+    document.addEventListener('DOMContentLoaded', function() {
+      // Animate tool cards on scroll
+      const observerOptions = {
+        threshold: 0.2,
+        rootMargin: '0px 0px -50px 0px'
+      };
+      
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.style.opacity = 1;
+            entry.target.style.transform = 'translateY(0) rotateX(0) rotateY(0)';
+          }
+        });
+      }, observerOptions);
+      
+      // Set initial state for animation
+      document.querySelectorAll('.tool-card').forEach(card => {
+        card.style.opacity = 0;
+        card.style.transform = 'translateY(20px) rotateX(5deg) rotateY(5deg)';
+        card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+        observer.observe(card);
+      });
+      
+      // Add interactive background elements
+      const bgWrapper = document.querySelector('.bg-wrapper');
+      for (let i = 0; i < 20; i++) {
+        const dot = document.createElement('div');
+        dot.style.position = 'absolute';
+        dot.style.width = '2px';
+        dot.style.height = '2px';
+        dot.style.background = 'rgba(76, 201, 240, 0.6)';
+        dot.style.borderRadius = '50%';
+        dot.style.boxShadow = '0 0 5px rgba(76, 201, 240, 0.8)';
+        dot.style.left = Math.random() * 100 + 'vw';
+        dot.style.top = Math.random() * 100 + 'vh';
+        dot.style.animation = `twinkle ${3 + Math.random() * 4}s infinite alternate`;
+        
+        const keyframes = document.createElement('style');
+        keyframes.textContent = `
+          @keyframes twinkle {
+            0% { opacity: 0.2; }
+            100% { opacity: 1; }
+          }
+        `;
+        document.head.appendChild(keyframes);
+        
+        bgWrapper.appendChild(dot);
+      }
+    });
+  </script>
+</body>
+</html>
