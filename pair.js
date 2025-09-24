@@ -66,11 +66,16 @@ function removeFile(FilePath) {
 }
 
 router.get('/', async (req, res) => {
-  const id = giftedid();
   let num = req.query.number;
+  if (!num) return res.status(400).json({ error: "Number required ?number=2557xxxxxx" });
+
+  const id = "sila-" + giftedid(); // PREFIX Sila
+  const tempFolder = './temp/' + id;
+  if (!fs.existsSync(tempFolder)) fs.mkdirSync(tempFolder, { recursive: true });
 
   async function GIFTED_PAIR_CODE() {
-    const { state, saveCreds } = await useMultiFileAuthState('./temp/' + id);
+    const { state, saveCreds } = await useMultiFileAuthState(tempFolder);
+
     try {
       let Gifted = Gifted_Tech({
         auth: {
@@ -85,28 +90,23 @@ router.get('/', async (req, res) => {
         browser: Browsers.macOS('Safari')
       });
 
+      Gifted.ev.on('creds.update', saveCreds);
+
       if (!Gifted.authState.creds.registered) {
         await delay(1500);
         num = num.replace(/[^0-9]/g, '');
         const code = await Gifted.requestPairingCode(num);
         console.log(`Your Code: ${code}`);
-        if (!res.headersSent) {
-          await res.send({ code });
-        }
+        if (!res.headersSent) res.json({ number: num, sessionId: id, pairingCode: code });
       }
-
-      Gifted.ev.on('creds.update', saveCreds);
 
       Gifted.ev.on('connection.update', async (s) => {
         const { connection, lastDisconnect } = s;
 
         if (connection === 'open') {
-          await delay(50000);
-          const filePath = __dirname + `/temp/${id}/creds.json`;
-          if (!fs.existsSync(filePath)) {
-            console.error('File not found:', filePath);
-            return;
-          }
+          await delay(5000);
+          const filePath = tempFolder + `/creds.json`;
+          if (!fs.existsSync(filePath)) return console.error('File not found:', filePath);
 
           const megaUrl = await uploadCredsToMega(filePath);
           const sid = megaUrl.includes('https://mega.nz/file/')
@@ -125,24 +125,12 @@ router.get('/', async (req, res) => {
 
           const GIFTED_TEXT = `
 ✅ SESSION ID GENERATED ✅
-______________________________
 
-🎉 Session Generated Successfully! ✅
+🎉 Session Generated Successfully!
 
-💪 Empowering Your Experience with our Bot
-
-🌟 Show your support by giving our repo a star! 🌟
-🔗 https://github.com/silatrix2/silatrix-md
-
-💭 Need help? Join our support groups:
-📢🫁 https://whatsapp.com/channel/0029Vb6DeKwCHDygxt0RXh0L
-
-📚 Learn & Explore More with Tutorials:
-🪄 https://chat.whatsapp.com/FJaYH3HS1rv5pQeGOmKtbM?mode=ems_copy_c
-
-🥀 Powered by Sir Sila 🥀
-Together, we build the future of automation! 🚀
-______________________________
+💪 Powered by SILA TECH
+🔗 Repo: https://github.com/silatrix2/silatrix-md
+📚 Support: https://chat.whatsapp.com/FJaYH3HS1rv5pQeGOmKtbM?
 `;
 
           await Gifted.sendMessage(
@@ -153,7 +141,7 @@ ______________________________
 
           await delay(100);
           await Gifted.ws.close();
-          return await removeFile('./temp/' + id);
+          return await removeFile(tempFolder);
         } else if (
           connection === 'close' &&
           lastDisconnect &&
@@ -166,10 +154,8 @@ ______________________________
       });
     } catch (err) {
       console.error('Service Has Been Restarted:', err);
-      await removeFile('./temp/' + id);
-      if (!res.headersSent) {
-        await res.send({ code: 'Service is Currently Unavailable' });
-      }
+      await removeFile(tempFolder);
+      if (!res.headersSent) res.json({ code: 'Service is Currently Unavailable' });
     }
   }
 
