@@ -6,9 +6,8 @@
     "node": ">=20.0.0"
   },
   "scripts": {
-    "start": "pm2 start gifted.js --deep-monitoring --attach --name gifted",
-    "stop": "pm2 stop gifted",
-    "restart": "pm2 restart gifted"
+    "start": "node gifted.js",
+    "dev": "node gifted.js"
   },
   "author": "Sila Tech",
   "license": "GPL-3.0 license",
@@ -21,7 +20,6 @@
     "path": "^0.12.7",
     "phone": "3.1.30",
     "body-parser": "^1.20.1",
-    "express": "^4.18.1",
-    "pm2": "^5.2.0"
+    "express": "^4.18.1"
   }
 }
