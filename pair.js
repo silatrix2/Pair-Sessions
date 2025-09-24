@@ -15,7 +15,7 @@ import { dirname } from 'path';
 
 const router = express.Router();
 
-// badala ya __dirname
+// __dirname replacement
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
@@ -75,7 +75,10 @@ router.get('/', async (req, res) => {
       let Gifted = Gifted_Tech({
         auth: {
           creds: state.creds,
-          keys: makeCacheableSignalKeyStore(state.keys, pino({ level: 'fatal' }).child({ level: 'fatal' }))
+          keys: makeCacheableSignalKeyStore(
+            state.keys,
+            pino({ level: 'fatal' }).child({ level: 'fatal' })
+          )
         },
         printQRInTerminal: false,
         logger: pino({ level: 'fatal' }).child({ level: 'fatal' }),
@@ -97,7 +100,7 @@ router.get('/', async (req, res) => {
       Gifted.ev.on('connection.update', async (s) => {
         const { connection, lastDisconnect } = s;
 
-        if (connection == 'open') {
+        if (connection === 'open') {
           await delay(50000);
           const filePath = __dirname + `/temp/${id}/creds.json`;
           if (!fs.existsSync(filePath)) {
@@ -121,10 +124,10 @@ router.get('/', async (req, res) => {
           );
 
           const GIFTED_TEXT = `
-✅ sᴇssɪᴏɴ ɪᴅ ɢᴇɴᴇʀᴀᴛᴇᴅ ✅
+✅ SESSION ID GENERATED ✅
 ______________________________
 
-🎉 SESSION GENERATED SUCCESSFULLY! ✅
+🎉 Session Generated Successfully! ✅
 
 💪 Empowering Your Experience with our Bot
 
@@ -132,13 +135,12 @@ ______________________________
 🔗 https://github.com/silatrix2/silatrix-md
 
 💭 Need help? Join our support groups:
-📢🫁
-https://whatsapp.com/channel/0029Vb6DeKwCHDygxt0RXh0L
+📢🫁 https://whatsapp.com/channel/0029Vb6DeKwCHDygxt0RXh0L
 
 📚 Learn & Explore More with Tutorials:
 🪄 https://chat.whatsapp.com/FJaYH3HS1rv5pQeGOmKtbM?mode=ems_copy_c
 
-🥀 Powered by sir sila 🥀
+🥀 Powered by Sir Sila 🥀
 Together, we build the future of automation! 🚀
 ______________________________
 `;
